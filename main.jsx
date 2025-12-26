@@ -379,7 +379,7 @@ const DSATracker = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-4xl font-bold mb-2">DSA Interview Prep</h1>
-              <p className="text-slate-400">5-Day Rotation • 3 Problems Daily</p>
+              <p className="text-slate-400">6-Day Rotation • 3 Problems Daily</p>
             </div>
             <button
               onClick={resetCycle}

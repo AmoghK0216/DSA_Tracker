@@ -1,4 +1,4 @@
-# DSA Tracker
+# LeetCode Tracker
 
 A personal, lightweight web application to track Data Structures & Algorithms practice with a 6-day rotation system covering key topics. Built for individual use without user authentication.
 
@@ -141,7 +141,7 @@ src/
 │   ├── DailyProblemCard.jsx    # Individual problem card for daily view
 │   ├── ProblemCard.jsx          # Card for solved problems history
 │   ├── ProgressBar.jsx          # Overall progress visualization
-│   ├── DaySelector.jsx          # 5-day rotation selector
+│   ├── DaySelector.jsx          # 6-day rotation selector
 │   ├── ViewTabs.jsx             # Tab navigation component
 │   ├── SearchBar.jsx            # Search functionality
 │   └── Modal.jsx                # Custom modal dialogs
