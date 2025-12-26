@@ -15,6 +15,7 @@ const DSATracker = () => {
   const [loading, setLoading] = useState(true);
   const saveTimerRef = useRef(null);
   const isLocalUpdateRef = useRef(false);
+  const searchInputRef = useRef(null);
 
   const [currentDay, setCurrentDay] = useState(1);
   const [activeView, setActiveView] = useState('today');
@@ -227,6 +228,51 @@ const DSATracker = () => {
       unsubscribeSolved();
     };
   }, []);
+
+  // Keyboard shortcuts for tab navigation
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      // Only trigger if not typing in an input/textarea
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        return;
+      }
+      
+      // Alt + number keys for tab switching
+      if (e.altKey && !e.ctrlKey && !e.shiftKey) {
+        switch(e.key) {
+          case '1':
+            e.preventDefault();
+            setActiveView('today');
+            break;
+          case '2':
+            e.preventDefault();
+            setActiveView('history');
+            break;
+          case '3':
+            e.preventDefault();
+            setActiveView('review');
+            break;
+          case '4':
+            e.preventDefault();
+            setActiveView('tricky');
+            break;
+          case 's':
+          case 'S':
+            // Focus search bar if in a view that has one
+            if (['history', 'review', 'tricky'].includes(activeView) && searchInputRef.current) {
+              e.preventDefault();
+              searchInputRef.current.focus();
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [activeView]);
 
   const toggleProblem = (day, problemNum) => {
     const key = `${day}-${problemNum}`;
@@ -517,7 +563,8 @@ const DSATracker = () => {
     return (
       <>
         <div className="flex items-center justify-between mb-4">
-          <SearchBar 
+          <SearchBar
+            ref={searchInputRef}
             searchTerm={searchTerm} 
             onSearchChange={setSearchTerm}
             placeholder="Search by name, link, or notes..."
@@ -670,7 +717,8 @@ const DSATracker = () => {
 
     return (
       <>
-        <SearchBar 
+        <SearchBar
+          ref={searchInputRef}
           searchTerm={searchTerm} 
           onSearchChange={setSearchTerm}
           placeholder="Search by name, link, or notes..."
