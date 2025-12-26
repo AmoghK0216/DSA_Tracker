@@ -13,6 +13,7 @@ import SearchBar from './components/SearchBar';
 const DSATracker = () => {
   const [loading, setLoading] = useState(true);
   const saveTimerRef = useRef(null);
+  const isLocalUpdateRef = useRef(false);
 
   const [currentDay, setCurrentDay] = useState(1);
   const [activeView, setActiveView] = useState('today');
@@ -30,26 +31,38 @@ const DSATracker = () => {
       }
       // Set new timer to save after 1 second of inactivity
       saveTimerRef.current = setTimeout(() => {
+        console.log("💾 Saving to Firebase (debounced)");
+        isLocalUpdateRef.current = true;
         const dataDocRef = doc(db, 'appData', 'main');
         setDoc(dataDocRef, {
           currentDay: updates.currentDay ?? currentDay,
           problemData: updates.problemData ?? problemData,
           dailyProblems: updates.dailyProblems ?? dailyProblems,
           lastUpdated: new Date().toISOString()
-        }, { merge: true }).catch((error) => {
+        }, { merge: true }).then(() => {
+          console.log("✅ Saved successfully (debounced)");
+        }).catch((error) => {
           console.error("Error saving data:", error);
+        }).finally(() => {
+          isLocalUpdateRef.current = false;
         });
       }, 1000);
     } else {
       // Immediate save
+      console.log("💾 Saving to Firebase (immediate)");
+      isLocalUpdateRef.current = true;
       const dataDocRef = doc(db, 'appData', 'main');
       setDoc(dataDocRef, {
         currentDay: updates.currentDay ?? currentDay,
         problemData: updates.problemData ?? problemData,
         dailyProblems: updates.dailyProblems ?? dailyProblems,
         lastUpdated: new Date().toISOString()
-      }, { merge: true }).catch((error) => {
+      }, { merge: true }).then(() => {
+        console.log("✅ Saved successfully (immediate)");
+      }).catch((error) => {
         console.error("Error saving data:", error);
+      }).finally(() => {
+        isLocalUpdateRef.current = false;
       });
     }
   };
@@ -59,9 +72,16 @@ const DSATracker = () => {
     const dataDocRef = doc(db, 'appData', 'main');
     
     const unsubscribe = onSnapshot(dataDocRef, (docSnap) => {
+      // Skip updates that originated from local changes
+      if (isLocalUpdateRef.current) {
+        console.log("⏭️ Skipping onSnapshot (local update)");
+        isLocalUpdateRef.current = false;
+        return;
+      }
+      
       if (docSnap.exists()) {
         const data = docSnap.data();
-        console.log("Data loaded from Firebase");
+        console.log("📥 Data loaded from Firebase");
         setCurrentDay(data.currentDay || 1);
         setProblemData(data.problemData || {});
         setDailyProblems(data.dailyProblems || {});
