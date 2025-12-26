@@ -61,32 +61,30 @@ const DailyProblemCard = ({
             rows="2"
           />
 
-          {isCompleted && (
-            <div className="flex gap-2 mt-3">
-              <button
-                onClick={() => onToggleFlag('needsReview')}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors ${
-                  data.needsReview 
-                    ? 'bg-yellow-600 text-white' 
-                    : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
-                }`}
-              >
-                <Eye size={14} />
-                Review
-              </button>
-              <button
-                onClick={() => onToggleFlag('isTricky')}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors ${
-                  data.isTricky 
-                    ? 'bg-red-600 text-white' 
-                    : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
-                }`}
-              >
-                <Flag size={14} />
-                Tricky
-              </button>
-            </div>
-          )}
+          <div className="flex gap-2 mt-3">
+            <button
+              onClick={() => onToggleFlag('needsReview')}
+              className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors ${
+                data.needsReview 
+                  ? 'bg-yellow-600 text-white' 
+                  : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+              }`}
+            >
+              <Eye size={14} />
+              Review
+            </button>
+            <button
+              onClick={() => onToggleFlag('isTricky')}
+              className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors ${
+                data.isTricky 
+                  ? 'bg-red-600 text-white' 
+                  : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+              }`}
+            >
+              <Flag size={14} />
+              Tricky
+            </button>
+          </div>
         </div>
       </div>
     </div>

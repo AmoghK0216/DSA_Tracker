@@ -108,7 +108,7 @@ const ProblemCard = ({
                 </button>
                 <button
                   onClick={() => onMarkReviewed(prob.id)}
-                  className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-green-600 text-white hover:bg-green-700"
+                  className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-slate-600 text-slate-300 hover:bg-green-600"
                 >
                   <CheckCircle2 size={12} />
                   Reviewed Today
