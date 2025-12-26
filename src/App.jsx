@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calendar, TrendingUp, RotateCcw, AlertCircle } from 'lucide-react';
+import { Calendar, TrendingUp, RotateCcw, AlertCircle, Plus, X } from 'lucide-react';
 import { db } from './firebase';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { topics, getDayFocus } from './constants';
@@ -21,6 +21,15 @@ const DSATracker = () => {
   const [dailyProblems, setDailyProblems] = useState({});
   const [editingProblemId, setEditingProblemId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newProblem, setNewProblem] = useState({
+    name: '',
+    link: '',
+    notes: '',
+    day: 1,
+    needsReview: false,
+    isTricky: false
+  });
 
   // Helper function to save data to Firebase
   const saveToFirebase = (updates, debounce = false) => {
@@ -265,14 +274,70 @@ const DSATracker = () => {
     );
   };
 
+  const addNewProblem = () => {
+    if (!newProblem.name.trim()) {
+      alert('Please enter a problem name');
+      return;
+    }
+
+    const timestamp = new Date().toISOString();
+    const uniqueId = `${timestamp}-manual`;
+    
+    const updatedProblemData = {
+      ...problemData,
+      [uniqueId]: {
+        name: newProblem.name,
+        link: newProblem.link,
+        notes: newProblem.notes,
+        completedDate: timestamp,
+        day: newProblem.day,
+        needsReview: newProblem.needsReview,
+        isTricky: newProblem.isTricky
+      }
+    };
+    
+    setProblemData(updatedProblemData);
+    saveToFirebase({ problemData: updatedProblemData });
+    
+    // Reset form
+    setNewProblem({
+      name: '',
+      link: '',
+      notes: '',
+      day: 1,
+      needsReview: false,
+      isTricky: false
+    });
+    setIsAddingNew(false);
+  };
+
+  const cancelAddNew = () => {
+    setNewProblem({
+      name: '',
+      link: '',
+      notes: '',
+      day: 1,
+      needsReview: false,
+      isTricky: false
+    });
+    setIsAddingNew(false);
+  };
+
   const renderHistoryView = () => {
     const allProblems = getAllSolvedProblems();
     
-    if (allProblems.length === 0) {
+    if (allProblems.length === 0 && !isAddingNew) {
       return (
         <div className="text-center py-12 text-slate-400">
           <AlertCircle size={48} className="mx-auto mb-4 opacity-50" />
-          <p>No completed problems yet. Start solving!</p>
+          <p className="mb-4">No completed problems yet. Start solving!</p>
+          <button
+            onClick={() => setIsAddingNew(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors mx-auto"
+          >
+            <Plus size={16} />
+            Add Problem
+          </button>
         </div>
       );
     }
@@ -281,12 +346,117 @@ const DSATracker = () => {
 
     return (
       <>
-        <SearchBar 
-          searchTerm={searchTerm} 
-          onSearchChange={setSearchTerm}
-          placeholder="Search by name, link, or notes..."
-        />
-        {filteredProblems.length === 0 ? (
+        <div className="flex items-center justify-between mb-4">
+          <SearchBar 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm}
+            placeholder="Search by name, link, or notes..."
+          />
+          {!isAddingNew && (
+            <button
+              onClick={() => setIsAddingNew(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors ml-3 flex-shrink-0"
+            >
+              <Plus size={16} />
+              Add Problem
+            </button>
+          )}
+        </div>
+
+        {isAddingNew && (
+          <div className="bg-slate-700 rounded-lg p-4 border border-blue-500 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold">Add New Problem</h3>
+              <button
+                onClick={cancelAddNew}
+                className="text-slate-400 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="Problem name *"
+                value={newProblem.name}
+                onChange={(e) => setNewProblem({ ...newProblem, name: e.target.value })}
+                className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              />
+              
+              <input
+                type="text"
+                placeholder="LeetCode link"
+                value={newProblem.link}
+                onChange={(e) => setNewProblem({ ...newProblem, link: e.target.value })}
+                className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              />
+              
+              <textarea
+                placeholder="Notes"
+                value={newProblem.notes}
+                onChange={(e) => setNewProblem({ ...newProblem, notes: e.target.value })}
+                className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 resize-none"
+                rows="3"
+              />
+
+              <div className="flex items-center gap-4">
+                <label className="text-sm flex items-center gap-2">
+                  <span className="text-slate-400">Day:</span>
+                  <select
+                    value={newProblem.day}
+                    onChange={(e) => setNewProblem({ ...newProblem, day: parseInt(e.target.value) })}
+                    className="bg-slate-600 border border-slate-500 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500"
+                  >
+                    {topics.map(topic => (
+                      <option key={topic.day} value={topic.day}>
+                        Day {topic.day} - {topic.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="text-sm flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newProblem.needsReview}
+                    onChange={(e) => setNewProblem({ ...newProblem, needsReview: e.target.checked })}
+                    className="rounded"
+                  />
+                  <span>Needs Review</span>
+                </label>
+
+                <label className="text-sm flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newProblem.isTricky}
+                    onChange={(e) => setNewProblem({ ...newProblem, isTricky: e.target.checked })}
+                    className="rounded"
+                  />
+                  <span>Tricky</span>
+                </label>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={addNewProblem}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors text-sm"
+                >
+                  <Plus size={14} />
+                  Add Problem
+                </button>
+                <button
+                  onClick={cancelAddNew}
+                  className="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded transition-colors text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {filteredProblems.length === 0 && !isAddingNew ? (
           <div className="text-center py-12 text-slate-400">
             <AlertCircle size={48} className="mx-auto mb-4 opacity-50" />
             <p>No problems match "{searchTerm}"</p>

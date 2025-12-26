@@ -3,7 +3,7 @@ import { topics } from '../constants';
 
 const DaySelector = ({ currentDay, onDayChange, getDayProgress }) => {
   return (
-    <div className="grid grid-cols-5 gap-3 mb-8">
+    <div className="grid grid-cols-6 gap-3 mb-8">
       {topics.map(topic => {
         const progress = getDayProgress(topic.day);
         return (
