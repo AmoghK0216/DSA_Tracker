@@ -1,6 +1,6 @@
 # DSA Interview Prep Tracker
 
-A modern, efficient web application to track your Data Structures & Algorithms practice with a 6-day rotation system covering key topics.
+A personal, lightweight web application to track Data Structures & Algorithms practice with a 6-day rotation system covering key topics. Built for individual use without user authentication.
 
 ## Features
 
@@ -29,8 +29,8 @@ A modern, efficient web application to track your Data Structures & Algorithms p
 - `Alt+S` - Focus search bar
 - `Esc` - Unfocus search bar
 
-### 🔄 Real-time Sync
-- Cloud-based storage with Firebase Firestore
+### 🔄 Cloud Storage
+- Personal cloud-based storage with Firebase Firestore
 - Automatic save with optimized database operations
 - Access your progress from any device
 
@@ -40,7 +40,6 @@ A modern, efficient web application to track your Data Structures & Algorithms p
 - **Styling**: TailwindCSS
 - **Database**: Firebase Firestore
 - **Icons**: Lucide React
-- **Authentication**: Firebase Anonymous Auth
 
 ## Getting Started
 
@@ -65,7 +64,6 @@ A modern, efficient web application to track your Data Structures & Algorithms p
 3. **Set up Firebase**
    - Create a Firebase project at [firebase.google.com](https://firebase.google.com)
    - Enable Firestore Database
-   - Enable Anonymous Authentication
    - Create a `.env` file in the root directory:
      ```env
      VITE_FIREBASE_API_KEY=your_api_key
@@ -83,11 +81,13 @@ A modern, efficient web application to track your Data Structures & Algorithms p
    service cloud.firestore {
      match /databases/{database}/documents {
        match /appData/{document} {
-         allow read, write: if true;
+         allow read, write: if true;  // Open access for personal use
        }
      }
    }
    ```
+   
+   > **Note:** These rules allow open access since this is a personal tracking tool. For additional security, consider restricting by IP or using Firebase App Check.
 
 5. **Run the development server**
    ```bash
