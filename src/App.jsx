@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, TrendingUp, RotateCcw, AlertCircle, Plus, X } from 'lucide-react';
 import { db } from './firebase';
-import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, deleteField, onSnapshot, getDoc } from 'firebase/firestore';
 import { topics, getDayFocus } from './constants';
 import ProblemCard from './components/ProblemCard';
 import DailyProblemCard from './components/DailyProblemCard';
@@ -9,6 +9,7 @@ import ProgressBar from './components/ProgressBar';
 import DaySelector from './components/DaySelector';
 import ViewTabs from './components/ViewTabs';
 import SearchBar from './components/SearchBar';
+import Modal from './components/Modal';
 
 const DSATracker = () => {
   const [loading, setLoading] = useState(true);
@@ -30,80 +31,201 @@ const DSATracker = () => {
     needsReview: false,
     isTricky: false
   });
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'confirm',
+    variant: 'warning',
+    onConfirm: null
+  });
 
-  // Helper function to save data to Firebase
-  const saveToFirebase = (updates, debounce = false) => {
+  // Helper functions to save data to Firebase
+  const saveDailyToFirebase = (updates, debounce = false) => {
     if (debounce) {
-      // Clear existing timer
       if (saveTimerRef.current) {
         clearTimeout(saveTimerRef.current);
       }
-      // Set new timer to save after 1 second of inactivity
       saveTimerRef.current = setTimeout(() => {
-        console.log("💾 Saving to Firebase (debounced)");
         isLocalUpdateRef.current = true;
-        const dataDocRef = doc(db, 'appData', 'main');
-        setDoc(dataDocRef, {
-          currentDay: updates.currentDay ?? currentDay,
-          problemData: updates.problemData ?? problemData,
-          dailyProblems: updates.dailyProblems ?? dailyProblems,
+        const dailyDocRef = doc(db, 'appData', 'daily');
+        setDoc(dailyDocRef, {
+          ...updates,
           lastUpdated: new Date().toISOString()
-        }, { merge: true }).then(() => {
-          console.log("✅ Saved successfully (debounced)");
         }).catch((error) => {
-          console.error("Error saving data:", error);
+          console.error("Error saving daily data:", error);
         }).finally(() => {
           isLocalUpdateRef.current = false;
         });
       }, 1000);
     } else {
-      // Immediate save
-      console.log("💾 Saving to Firebase (immediate)");
       isLocalUpdateRef.current = true;
-      const dataDocRef = doc(db, 'appData', 'main');
-      setDoc(dataDocRef, {
-        currentDay: updates.currentDay ?? currentDay,
-        problemData: updates.problemData ?? problemData,
-        dailyProblems: updates.dailyProblems ?? dailyProblems,
+      const dailyDocRef = doc(db, 'appData', 'daily');
+      setDoc(dailyDocRef, {
+        ...updates,
         lastUpdated: new Date().toISOString()
-      }, { merge: true }).then(() => {
-        console.log("✅ Saved successfully (immediate)");
       }).catch((error) => {
-        console.error("Error saving data:", error);
+        console.error("Error saving daily data:", error);
       }).finally(() => {
         isLocalUpdateRef.current = false;
       });
     }
   };
 
+  const saveSolvedToFirebase = (id, value, debounce = false) => {
+    if (debounce) {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
+      saveTimerRef.current = setTimeout(() => {
+        isLocalUpdateRef.current = true;
+        const solvedDocRef = doc(db, 'appData', 'solved');
+        updateDoc(solvedDocRef, {
+          [`problemData.${id}`]: value,
+          lastUpdated: new Date().toISOString()
+        }).catch((error) => {
+          console.error("Error saving solved data:", error);
+        }).finally(() => {
+          isLocalUpdateRef.current = false;
+        });
+      }, 1000);
+    } else {
+      isLocalUpdateRef.current = true;
+      const solvedDocRef = doc(db, 'appData', 'solved');
+      updateDoc(solvedDocRef, {
+        [`problemData.${id}`]: value,
+        lastUpdated: new Date().toISOString()
+      }).catch((error) => {
+        console.error("Error saving solved data:", error);
+      }).finally(() => {
+        isLocalUpdateRef.current = false;
+      });
+    }
+  };
+
+  // One-time migration from old structure to new structure
+  useEffect(() => {
+    const migrateData = async () => {
+      try {
+        const oldDocRef = doc(db, 'appData', 'main');
+        const dailyDocRef = doc(db, 'appData', 'daily');
+        const solvedDocRef = doc(db, 'appData', 'solved');
+        
+        // Check if old document exists
+        const oldDoc = await getDoc(oldDocRef);
+        
+        if (oldDoc.exists()) {
+          const oldData = oldDoc.data();
+          
+          // Migrate daily data
+          await setDoc(dailyDocRef, {
+            currentDay: oldData.currentDay || 1,
+            dailyProblems: oldData.dailyProblems || {},
+            lastUpdated: new Date().toISOString()
+          });
+          
+          // Migrate solved data
+          await setDoc(solvedDocRef, {
+            problemData: oldData.problemData || {},
+            lastUpdated: new Date().toISOString()
+          });
+        }
+      } catch (error) {
+        console.error('❌ Migration error:', error);
+      }
+    };
+    
+    migrateData();
+  }, []);
+
   // Load data from Firebase on mount
   useEffect(() => {
-    const dataDocRef = doc(db, 'appData', 'main');
+    const dailyDocRef = doc(db, 'appData', 'daily');
+    const solvedDocRef = doc(db, 'appData', 'solved');
     
-    const unsubscribe = onSnapshot(dataDocRef, (docSnap) => {
+    let dailyLoaded = false;
+    let solvedLoaded = false;
+    
+    const checkLoading = () => {
+      if (dailyLoaded && solvedLoaded) {
+        setLoading(false);
+      }
+    };
+    
+    const unsubscribeDaily = onSnapshot(dailyDocRef, (docSnap) => {
       // Skip updates that originated from local changes
       if (isLocalUpdateRef.current) {
-        console.log("⏭️ Skipping onSnapshot (local update)");
         isLocalUpdateRef.current = false;
         return;
       }
       
       if (docSnap.exists()) {
         const data = docSnap.data();
-        console.log("📥 Data loaded from Firebase");
         setCurrentDay(data.currentDay || 1);
-        setProblemData(data.problemData || {});
         setDailyProblems(data.dailyProblems || {});
-      } else {
-        console.log("No document found, starting fresh");
       }
-      setLoading(false);
+      dailyLoaded = true;
+      checkLoading();
     }, (error) => {
-      console.error("Error loading data:", error);
-      setLoading(false);
+      console.error("Error loading daily data:", error);
+      dailyLoaded = true;
+      checkLoading();
+    });
+    
+    const unsubscribeSolved = onSnapshot(solvedDocRef, (docSnap) => {
+      // Skip updates that originated from local changes
+      if (isLocalUpdateRef.current) {
+        isLocalUpdateRef.current = false;
+        return;
+      }
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        
+        // Clean up malformed data - consolidate root-level "problemData.xxx" fields
+        const cleanedProblemData = data.problemData || {};
+        
+        // Check for any malformed fields at root level and merge them in
+        Object.keys(data).forEach(key => {
+          if (key.startsWith('problemData.')) {
+            const actualId = key.replace('problemData.', '');
+            if (!cleanedProblemData[actualId]) {
+              cleanedProblemData[actualId] = data[key];
+            }
+          }
+        });
+        
+        // Fix nested timestamp entries (e.g., "2025-12-26T21:48:34": { "034Z-1-2": {...} })
+        Object.keys(cleanedProblemData).forEach(key => {
+          const entry = cleanedProblemData[key];
+          // Check if this entry has nested timestamp parts
+          if (entry && typeof entry === 'object' && !entry.name && !entry.completedDate) {
+            // This might be a partial timestamp with nested data
+            const nestedKeys = Object.keys(entry);
+            if (nestedKeys.length === 1 && nestedKeys[0].includes('Z-')) {
+              // Reconstruct the full ID and flatten
+              const fullId = `${key}.${nestedKeys[0]}`;
+              const actualData = entry[nestedKeys[0]];
+              cleanedProblemData[fullId] = actualData;
+              delete cleanedProblemData[key];
+            }
+          }
+        });
+        
+        setProblemData(cleanedProblemData);
+      }
+      solvedLoaded = true;
+      checkLoading();
+    }, (error) => {
+      console.error("Error loading solved data:", error);
+      solvedLoaded = true;
+      checkLoading();
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeDaily();
+      unsubscribeSolved();
+    };
   }, []);
 
   const toggleProblem = (day, problemNum) => {
@@ -121,28 +243,30 @@ const DSATracker = () => {
       }
     };
 
+    setDailyProblems(updatedDailyProblems);
+    saveDailyToFirebase({ dailyProblems: updatedDailyProblems, currentDay });
+    
     // If marking as complete, also save to persistent problem data
-    let updatedProblemData = problemData;
     if (!data.completed) {
-      const uniqueId = `${timestamp}-${day}-${problemNum}`;
-      updatedProblemData = {
+      // Remove periods from timestamp to avoid Firestore path issues
+      const uniqueId = `${timestamp.replace(/\./g, '_')}-${day}-${problemNum}`;
+      const newProblem = {
+        name: data.name || '',
+        link: data.link || '',
+        notes: data.notes || '',
+        completedDate: timestamp,
+        day: day,
+        problemNum: problemNum,
+        needsReview: data.needsReview || false,
+        isTricky: data.isTricky || false
+      };
+      const updatedProblemData = {
         ...problemData,
-        [uniqueId]: {
-          name: data.name || '',
-          link: data.link || '',
-          notes: data.notes || '',
-          completedDate: timestamp,
-          day: day,
-          problemNum: problemNum,
-          needsReview: data.needsReview || false,
-          isTricky: data.isTricky || false
-        }
+        [uniqueId]: newProblem
       };
       setProblemData(updatedProblemData);
+      saveSolvedToFirebase(uniqueId, newProblem);
     }
-    
-    setDailyProblems(updatedDailyProblems);
-    saveToFirebase({ dailyProblems: updatedDailyProblems, problemData: updatedProblemData });
   };
 
   const updateDailyProblem = (key, field, value) => {
@@ -154,7 +278,7 @@ const DSATracker = () => {
       }
     };
     setDailyProblems(updated);
-    saveToFirebase({ dailyProblems: updated }, true); // Debounced save
+    saveDailyToFirebase({ dailyProblems: updated, currentDay }, true); // Debounced save
   };
 
   const toggleDailyFlag = (key, flagType) => {
@@ -166,41 +290,61 @@ const DSATracker = () => {
       }
     };
     setDailyProblems(updated);
-    saveToFirebase({ dailyProblems: updated });
+    saveDailyToFirebase({ dailyProblems: updated, currentDay });
   };
 
   const togglePersistentFlag = (id, flagType) => {
+    const newValue = !problemData[id]?.[flagType];
     const updated = {
       ...problemData,
       [id]: {
         ...problemData[id],
-        [flagType]: !problemData[id]?.[flagType]
+        [flagType]: newValue
       }
     };
     setProblemData(updated);
-    saveToFirebase({ problemData: updated });
+    saveSolvedToFirebase(`${id}.${flagType}`, newValue);
   };
 
   const deleteProblem = (id) => {
-    if (window.confirm('Are you sure you want to delete this problem?')) {
-      const updated = { ...problemData };
-      delete updated[id];
-      setProblemData(updated);
-      saveToFirebase({ problemData: updated });
-    }
+    setModal({
+      isOpen: true,
+      title: 'Delete Problem',
+      message: 'Are you sure you want to delete this problem? This action cannot be undone.',
+      type: 'confirm',
+      variant: 'warning',
+      onConfirm: () => {
+        const updated = { ...problemData };
+        delete updated[id];
+        setProblemData(updated);
+        saveSolvedToFirebase(id, deleteField());
+      }
+    });
   };
 
   const markAsReviewedToday = (id) => {
+    const timestamp = new Date().toISOString();
     const updated = {
       ...problemData,
       [id]: {
         ...problemData[id],
-        lastReviewedDate: new Date().toISOString(),
-        needsReview: false // Unmark from review when reviewed
+        lastReviewedDate: timestamp,
+        needsReview: false
       }
     };
     setProblemData(updated);
-    saveToFirebase({ problemData: updated });
+    // Update both fields atomically
+    const solvedDocRef = doc(db, 'appData', 'solved');
+    isLocalUpdateRef.current = true;
+    updateDoc(solvedDocRef, {
+      [`problemData.${id}.lastReviewedDate`]: timestamp,
+      [`problemData.${id}.needsReview`]: false,
+      lastUpdated: new Date().toISOString()
+    }).catch((error) => {
+      console.error("Error marking as reviewed:", error);
+    }).finally(() => {
+      isLocalUpdateRef.current = false;
+    });
   };
 
   const updateProblemField = (id, field, value) => {
@@ -212,7 +356,7 @@ const DSATracker = () => {
       }
     };
     setProblemData(updated);
-    saveToFirebase({ problemData: updated }, true); // Debounced save
+    saveSolvedToFirebase(`${id}.${field}`, value, true); // Debounced save
   };
 
   const getDayProgress = (day) => {
@@ -240,11 +384,18 @@ const DSATracker = () => {
   };
 
   const resetCycle = () => {
-    if (window.confirm('Reset current cycle? Your problem history will be preserved.')) {
-      setDailyProblems({});
-      setCurrentDay(1);
-      saveToFirebase({ dailyProblems: {}, currentDay: 1 });
-    }
+    setModal({
+      isOpen: true,
+      title: 'Reset Cycle',
+      message: 'Reset current cycle? Your problem history will be preserved, but all daily progress will be cleared.',
+      type: 'confirm',
+      variant: 'warning',
+      onConfirm: () => {
+        setDailyProblems({});
+        setCurrentDay(1);
+        saveDailyToFirebase({ dailyProblems: {}, currentDay: 1 });
+      }
+    });
   };
 
   const formatDate = (isoString) => {
@@ -259,7 +410,17 @@ const DSATracker = () => {
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
     }
-    saveToFirebase({ problemData });
+    // Force immediate save of the entire problem
+    const solvedDocRef = doc(db, 'appData', 'solved');
+    isLocalUpdateRef.current = true;
+    updateDoc(solvedDocRef, {
+      [`problemData.${id}`]: problemData[id],
+      lastUpdated: new Date().toISOString()
+    }).catch((error) => {
+      console.error("Error saving problem:", error);
+    }).finally(() => {
+      isLocalUpdateRef.current = false;
+    });
     setEditingProblemId(null);
   };
 
@@ -276,28 +437,37 @@ const DSATracker = () => {
 
   const addNewProblem = () => {
     if (!newProblem.name.trim()) {
-      alert('Please enter a problem name');
+      setModal({
+        isOpen: true,
+        title: 'Missing Information',
+        message: 'Please enter a problem name before adding.',
+        type: 'alert',
+        variant: 'info',
+        onConfirm: null
+      });
       return;
     }
 
     const timestamp = new Date().toISOString();
-    const uniqueId = `${timestamp}-manual`;
+    const uniqueId = `${timestamp.replace(/\./g, '_')}-manual`;
+    
+    const newProblemData = {
+      name: newProblem.name,
+      link: newProblem.link,
+      notes: newProblem.notes,
+      completedDate: timestamp,
+      day: newProblem.day,
+      needsReview: newProblem.needsReview,
+      isTricky: newProblem.isTricky
+    };
     
     const updatedProblemData = {
       ...problemData,
-      [uniqueId]: {
-        name: newProblem.name,
-        link: newProblem.link,
-        notes: newProblem.notes,
-        completedDate: timestamp,
-        day: newProblem.day,
-        needsReview: newProblem.needsReview,
-        isTricky: newProblem.isTricky
-      }
+      [uniqueId]: newProblemData
     };
     
     setProblemData(updatedProblemData);
-    saveToFirebase({ problemData: updatedProblemData });
+    saveSolvedToFirebase(uniqueId, newProblemData);
     
     // Reset form
     setNewProblem({
@@ -659,6 +829,17 @@ const DSATracker = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        onConfirm={modal.onConfirm}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        variant={modal.variant}
+      />
     </div>
   );
 };
