@@ -1,6 +1,17 @@
-# DSA Interview Prep Tracker
+# DSA Tracker
 
 A personal, lightweight web application to track Data Structures & Algorithms practice with a 6-day rotation system covering key topics. Built for individual use without user authentication.
+
+<img width="1878" height="1146" alt="image" src="https://github.com/user-attachments/assets/21cd9c1e-c644-4150-a946-7fa6244abd6d" />
+<br>
+<br>
+<br>
+<img width="1878" height="1140" alt="image" src="https://github.com/user-attachments/assets/5c22534f-551b-4766-a5b7-8a80311b7266" />
+
+
+
+
+
 
 ## Features
 
@@ -8,6 +19,8 @@ A personal, lightweight web application to track Data Structures & Algorithms pr
 - **6-Day Rotation**: Arrays, Linked Lists, Trees/Graphs, Dynamic Programming, and Advanced Topics
 - **3 Problems Daily**: Focused practice with manageable daily goals
 - Track progress with visual indicators
+- Reset the cycle manually to clear the daily problem data.
+ > **Note:** All solved problems are saved in solved problems tab. Reset clears the daily problem data, so you can start a new cycle
 
 ### 📊 Smart Problem Management
 - Mark problems as solved with automatic persistence
