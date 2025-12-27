@@ -2,11 +2,12 @@
 
 A personal, lightweight web application to track Data Structures & Algorithms practice with a 6-day rotation system covering key topics. Built for individual use without user authentication.
 
-<img width="1878" height="1146" alt="image" src="https://github.com/user-attachments/assets/21cd9c1e-c644-4150-a946-7fa6244abd6d" />
+<img width="1862" height="1116" alt="image" src="https://github.com/user-attachments/assets/e269b266-acf7-4dc4-abb5-69033910d1a8" />
 <br>
 <br>
 <br>
-<img width="1878" height="1140" alt="image" src="https://github.com/user-attachments/assets/5c22534f-551b-4766-a5b7-8a80311b7266" />
+<img width="1854" height="1116" alt="image" src="https://github.com/user-attachments/assets/a07273c3-4ae6-42c5-9a2b-2efb66192de3" />
+
 
 
 
