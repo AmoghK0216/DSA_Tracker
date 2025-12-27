@@ -1,7 +1,7 @@
 export const topics = [
   { day: 1, name: "Arrays, 2P & Slinding Window", color: "bg-blue-500" },
   { day: 2, name: "Binary Search & Sorting", color: "bg-purple-500" },
-  { day: 3, name: "Trees & Graphs", color: "bg-green-500" },
+  { day: 3, name: "Trees & Graphs", color: "bg-app-accent" },
   { day: 4, name: "DP, Recursion & Backtracking", color: "bg-orange-500" },
   { day: 5, name: "Stacks, Queues & Greedy", color: "bg-pink-500" },
   { day: 6, name: "Strings & HashMaps", color: "bg-yellow-500"}

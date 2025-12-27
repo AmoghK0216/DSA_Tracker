@@ -4,11 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LeetCode Tracker</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233b82f6'/><text x='50' y='70' font-size='45' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial, sans-serif'>LC</text></svg>" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23047857'/><text x='50' y='70' font-size='45' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial, sans-serif'>LC</text></svg>" />
     <style>
+      :root {
+        --bg-primary: #1a1612;
+        --bg-secondary: #221e19;
+        --accent-primary: #047857;
+        --text-muted: #a8a29e;
+      }
       body {
         margin: 0;
-        background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a);
+        background: linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary), var(--bg-primary));
         min-height: 100vh;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
       }
@@ -30,7 +36,7 @@
         width: 64px;
         height: 64px;
         border: 2px solid transparent;
-        border-bottom-color: #3b82f6;
+        border-bottom-color: var(--accent-primary);
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin: 0 auto 16px;
@@ -39,7 +45,7 @@
         to { transform: rotate(360deg); }
       }
       .loader-text {
-        color: #94a3b8;
+        color: var(--text-muted);
         font-size: 16px;
       }
     </style>

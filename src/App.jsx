@@ -544,12 +544,12 @@ const DSATracker = () => {
     
     if (allProblems.length === 0 && !isAddingNew) {
       return (
-        <div className="text-center py-12 text-slate-400">
+        <div className="text-center py-12 text-app-text-muted">
           <AlertCircle size={48} className="mx-auto mb-4 opacity-50" />
           <p className="mb-4">No completed problems yet. Start solving!</p>
           <button
             onClick={() => setIsAddingNew(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors mx-auto"
+            className="flex items-center gap-2 px-4 py-2 bg-app-accent hover:bg-app-accent-hover rounded-lg transition-colors mx-auto"
           >
             <Plus size={16} />
             Add Problem
@@ -572,7 +572,7 @@ const DSATracker = () => {
           {!isAddingNew && (
             <button
               onClick={() => setIsAddingNew(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors ml-3 flex-shrink-0"
+              className="flex items-center gap-2 px-4 py-2 bg-app-accent hover:bg-app-accent-hover rounded-lg transition-colors ml-3 flex-shrink-0"
             >
               <Plus size={16} />
               Add Problem
@@ -581,12 +581,12 @@ const DSATracker = () => {
         </div>
 
         {isAddingNew && (
-          <div className="bg-slate-700 rounded-lg p-4 border border-blue-500 mb-4">
+          <div className="bg-app-card rounded-lg p-4 border border-app-accent mb-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold">Add New Problem</h3>
               <button
                 onClick={cancelAddNew}
-                className="text-slate-400 hover:text-white"
+                className="text-app-text-muted hover:text-white"
               >
                 <X size={20} />
               </button>
@@ -598,7 +598,7 @@ const DSATracker = () => {
                 placeholder="Problem name *"
                 value={newProblem.name}
                 onChange={(e) => setNewProblem({ ...newProblem, name: e.target.value })}
-                className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                className="w-full bg-app-input border border-app-border-secondary rounded px-3 py-2 text-sm focus:outline-none focus:border-app-accent"
               />
               
               <input
@@ -606,24 +606,24 @@ const DSATracker = () => {
                 placeholder="LeetCode link"
                 value={newProblem.link}
                 onChange={(e) => setNewProblem({ ...newProblem, link: e.target.value })}
-                className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+                className="w-full bg-app-input border border-app-border-secondary rounded px-3 py-2 text-sm focus:outline-none focus:border-app-accent"
               />
               
               <textarea
                 placeholder="Notes"
                 value={newProblem.notes}
                 onChange={(e) => setNewProblem({ ...newProblem, notes: e.target.value })}
-                className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 resize-none"
+                className="w-full bg-app-input border border-app-border-secondary rounded px-3 py-2 text-sm focus:outline-none focus:border-app-accent resize-none"
                 rows="3"
               />
 
               <div className="flex items-center gap-4">
                 <label className="text-sm flex items-center gap-2">
-                  <span className="text-slate-400">Day:</span>
+                  <span className="text-app-text-muted">Day:</span>
                   <select
                     value={newProblem.day}
                     onChange={(e) => setNewProblem({ ...newProblem, day: parseInt(e.target.value) })}
-                    className="bg-slate-600 border border-slate-500 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-500"
+                    className="bg-app-input border border-app-border-secondary rounded px-2 py-1 text-sm focus:outline-none focus:border-app-accent"
                   >
                     {topics.map(topic => (
                       <option key={topic.day} value={topic.day}>
@@ -657,14 +657,14 @@ const DSATracker = () => {
               <div className="flex gap-2">
                 <button
                   onClick={addNewProblem}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition-colors text-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-app-accent hover:bg-app-accent-hover rounded transition-colors text-sm"
                 >
                   <Plus size={14} />
                   Add Problem
                 </button>
                 <button
                   onClick={cancelAddNew}
-                  className="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded transition-colors text-sm"
+                  className="px-4 py-2 bg-app-input hover:bg-app-input-dark rounded transition-colors text-sm"
                 >
                   Cancel
                 </button>
@@ -674,7 +674,7 @@ const DSATracker = () => {
         )}
 
         {filteredProblems.length === 0 && !isAddingNew ? (
-          <div className="text-center py-12 text-slate-400">
+          <div className="text-center py-12 text-app-text-muted">
             <AlertCircle size={48} className="mx-auto mb-4 opacity-50" />
             <p>No problems match "{searchTerm}"</p>
           </div>
@@ -706,7 +706,7 @@ const DSATracker = () => {
     
     if (filtered.length === 0) {
       return (
-        <div className="text-center py-12 text-slate-400">
+        <div className="text-center py-12 text-app-text-muted">
           <AlertCircle size={48} className="mx-auto mb-4 opacity-50" />
           <p>{emptyMessage}</p>
         </div>
@@ -724,7 +724,7 @@ const DSATracker = () => {
           placeholder="Search by name, link, or notes..."
         />
         {searchFiltered.length === 0 ? (
-          <div className="text-center py-12 text-slate-400">
+          <div className="text-center py-12 text-app-text-muted">
             <AlertCircle size={48} className="mx-auto mb-4 opacity-50" />
             <p>No problems match "{searchTerm}"</p>
           </div>
@@ -755,28 +755,28 @@ const DSATracker = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-app-bg-primary via-app-bg-secondary to-app-bg-primary text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-slate-400">Loading your data...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-app-accent mx-auto mb-4"></div>
+          <p className="text-app-text-muted">Loading your data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+    <div className="min-h-screen bg-gradient-to-br from-app-bg-primary via-app-bg-secondary to-app-bg-primary text-white p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-4xl font-bold mb-2">LeetCode Tracker</h1>
-              <p className="text-slate-400">6-Day Rotation • 3 Problems Daily</p>
+              <p className="text-app-text-muted">6-Day Rotation • 3 Problems Daily</p>
             </div>
             <button
               onClick={resetCycle}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-app-card hover:bg-app-card-hover rounded-lg transition-colors"
             >
               <RotateCcw size={16} />
               Reset Cycle
@@ -812,7 +812,7 @@ const DSATracker = () => {
         )}
 
         {/* Content Area */}
-        <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+        <div className="bg-app-bg-secondary rounded-xl p-6 border border-app-border">
           {activeView === 'today' && (
             <>
               <div className="flex items-center gap-3 mb-6">

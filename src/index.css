@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Background Colors - Very Dark Beige Tones */
+  --bg-primary: #1a1612;
+  --bg-secondary: #221e19;
+  --bg-tertiary: #2a2520;
+  --bg-card: #2a2520;
+  --bg-card-hover: #332f28;
+  --bg-input: #3a352e;
+  --bg-input-dark: #2a2520;
+  
+  /* Accent Colors - Royal Velvety Green */
+  --accent-primary: #047857;
+  --accent-primary-hover: #065f46;
+  --accent-secondary: #059669;
+  
+  /* Text Colors - Light for Dark Backgrounds */
+  --text-primary: #ffffff;
+  --text-secondary: #e5e5e5;
+  --text-muted: #a8a29e;
+  --text-dim: #78716c;
+  
+  /* Border Colors */
+  --border-primary: #3a352e;
+  --border-secondary: #4a443c;
+  --border-accent: #047857;
+  --border-success: #047857;
+  
+  /* Status Colors */
+  --status-success: #047857;
+  --status-warning: #f59e0b;
+  --status-error: #ef4444;
+  
+  /* Scrollbar Colors */
+  --scrollbar-track: #2a2520;
+  --scrollbar-thumb: #4a443c;
+  --scrollbar-thumb-hover: #5a5449;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -23,22 +61,22 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: var(--scrollbar-track);
   border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0c0d3e;
+  background: var(--scrollbar-thumb);
   border-radius: 6px;
-  border: 2px solid #0a092a;
+  border: 2px solid var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #0f172a #1e293b;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }

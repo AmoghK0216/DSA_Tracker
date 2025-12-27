@@ -11,8 +11,8 @@ const DailyProblemCard = ({
 }) => {
   return (
     <div 
-      className={`bg-slate-700 rounded-lg p-5 border-2 transition-all ${
-        isCompleted ? 'border-green-500' : 'border-slate-600'
+      className={`bg-app-card rounded-lg p-5 border-2 transition-all ${
+        isCompleted ? 'border-app-border-success' : 'border-app-border'
       }`}
     >
       <div className="flex items-start gap-4">
@@ -21,9 +21,9 @@ const DailyProblemCard = ({
           className="mt-1 flex-shrink-0"
         >
           {isCompleted ? (
-            <CheckCircle2 className="text-green-500" size={28} />
+            <CheckCircle2 className="text-app-border-success" size={28} />
           ) : (
-            <Circle className="text-slate-500 hover:text-slate-400" size={28} />
+            <Circle className="text-app-text-dim hover:text-app-text-muted" size={28} />
           )}
         </button>
         
@@ -31,7 +31,7 @@ const DailyProblemCard = ({
           <div className="flex items-center gap-2 mb-3 flex-wrap">
             <h3 className="text-lg font-semibold">Problem {problemNum}</h3>
             {isCompleted && (
-              <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">
+              <span className="text-xs bg-app-border-success text-white px-2 py-1 rounded">
                 Completed
               </span>
             )}
@@ -42,7 +42,7 @@ const DailyProblemCard = ({
             placeholder="Problem name (e.g., Two Sum)"
             value={data.name || ''}
             onChange={(e) => onUpdate('name', e.target.value)}
-            className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 mb-2"
+            className="w-full bg-app-input border border-app-border-secondary rounded px-3 py-2 text-sm focus:outline-none focus:border-app-accent mb-2"
           />
           
           <input
@@ -50,14 +50,14 @@ const DailyProblemCard = ({
             placeholder="LeetCode link (e.g., https://leetcode.com/problems/two-sum/)"
             value={data.link || ''}
             onChange={(e) => onUpdate('link', e.target.value)}
-            className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 mb-2"
+            className="w-full bg-app-input border border-app-border-secondary rounded px-3 py-2 text-sm focus:outline-none focus:border-app-accent mb-2"
           />
           
           <textarea
             placeholder="Notes: key insights, time/space complexity, mistakes made..."
             value={data.notes || ''}
             onChange={(e) => onUpdate('notes', e.target.value)}
-            className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 resize-none"
+            className="w-full bg-app-input border border-app-border-secondary rounded px-3 py-2 text-sm focus:outline-none focus:border-app-accent resize-none"
             rows="2"
           />
 
@@ -67,7 +67,7 @@ const DailyProblemCard = ({
               className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors ${
                 data.needsReview 
                   ? 'bg-yellow-600 text-white' 
-                  : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+                  : 'bg-app-input text-app-text-secondary hover:bg-app-input-dark'
               }`}
             >
               <Eye size={14} />
@@ -78,7 +78,7 @@ const DailyProblemCard = ({
               className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors ${
                 data.isTricky 
                   ? 'bg-red-600 text-white' 
-                  : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+                  : 'bg-app-input text-app-text-secondary hover:bg-app-input-dark'
               }`}
             >
               <Flag size={14} />

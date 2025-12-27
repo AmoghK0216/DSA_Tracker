@@ -16,12 +16,12 @@ const ProblemCard = ({
   const topic = topics.find(t => t.day === prob.day);
   
   return (
-    <div className="bg-slate-700 rounded-lg p-4 border border-slate-600">
+    <div className="bg-app-card rounded-lg p-4 border border-app-border">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             <div className={`w-2 h-2 ${topic?.color} rounded-full`} />
-            <span className="text-sm text-slate-400">Day {prob.day} - {topic?.name}</span>
+            <span className="text-sm text-app-text-muted">Day {prob.day} - {topic?.name}</span>
           </div>
           
           {isEditing ? (
@@ -31,7 +31,7 @@ const ProblemCard = ({
                 placeholder="Problem name"
                 value={prob.name || ''}
                 onChange={(e) => onUpdateField(prob.id, 'name', e.target.value)}
-                className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm font-semibold focus:outline-none focus:border-blue-500 mb-2"
+                className="w-full bg-app-input border border-app-border-secondary rounded px-3 py-2 text-sm font-semibold focus:outline-none focus:border-app-accent mb-2"
               />
               
               <input
@@ -39,14 +39,14 @@ const ProblemCard = ({
                 placeholder="LeetCode link"
                 value={prob.link || ''}
                 onChange={(e) => onUpdateField(prob.id, 'link', e.target.value)}
-                className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 mb-2"
+                className="w-full bg-app-input border border-app-border-secondary rounded px-3 py-2 text-sm focus:outline-none focus:border-app-accent mb-2"
               />
               
               <textarea
                 placeholder="Notes"
                 value={prob.notes || ''}
                 onChange={(e) => onUpdateField(prob.id, 'notes', e.target.value)}
-                className="w-full bg-slate-600 border border-slate-500 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 resize-none mb-2"
+                className="w-full bg-app-input border border-app-border-secondary rounded px-3 py-2 text-sm focus:outline-none focus:border-app-accent resize-none mb-2"
                 rows="3"
               />
             </>
@@ -60,21 +60,21 @@ const ProblemCard = ({
                   href={prob.link} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-sm text-blue-400 hover:text-blue-300 underline mb-2 inline-block"
+                  className="text-sm text-app-accent-light hover:text-app-accent underline mb-2 inline-block"
                 >
                   View on LeetCode →
                 </a>
               )}
               {prob.notes && (
-                <p className="text-sm text-slate-300 mb-2 whitespace-pre-wrap">{prob.notes}</p>
+                <p className="text-sm text-app-text-secondary mb-2 whitespace-pre-wrap">{prob.notes}</p>
               )}
             </>
           )}
           
           <div className="flex gap-2 items-center flex-wrap mb-2">
-            <span className="text-xs text-slate-400">Solved: {formatDate(prob.completedDate)}</span>
+            <span className="text-xs text-app-text-muted">Solved: {formatDate(prob.completedDate)}</span>
             {prob.lastReviewedDate && (
-              <span className="text-xs text-green-400">Last reviewed: {formatDate(prob.lastReviewedDate)}</span>
+              <span className="text-xs text-app-accent-light">Last reviewed: {formatDate(prob.lastReviewedDate)}</span>
             )}
             {prob.needsReview && (
               <span className="text-xs bg-yellow-600 text-white px-2 py-0.5 rounded flex items-center gap-1">
@@ -92,7 +92,7 @@ const ProblemCard = ({
             {isEditing ? (
               <button
                 onClick={() => onSave(prob.id)}
-                className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-blue-600 text-white hover:bg-blue-700"
+                className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-app-accent text-white hover:bg-app-accent-hover"
               >
                 <Save size={12} />
                 Save
@@ -101,14 +101,14 @@ const ProblemCard = ({
               <>
                 <button
                   onClick={() => onEdit(prob.id)}
-                  className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-slate-600 text-slate-300 hover:bg-slate-500"
+                  className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-app-input text-app-text-secondary hover:bg-app-input-dark"
                 >
                   <Edit2 size={12} />
                   Edit
                 </button>
                 <button
                   onClick={() => onMarkReviewed(prob.id)}
-                  className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-slate-600 text-slate-300 hover:bg-green-600"
+                  className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-app-input text-app-text-secondary hover:bg-app-accent"
                 >
                   <CheckCircle2 size={12} />
                   Reviewed Today
@@ -120,7 +120,7 @@ const ProblemCard = ({
               className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
                 prob.needsReview 
                   ? 'bg-yellow-600 text-white' 
-                  : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+                  : 'bg-app-input text-app-text-secondary hover:bg-app-input-dark'
               }`}
             >
               <Eye size={12} />
@@ -131,7 +131,7 @@ const ProblemCard = ({
               className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
                 prob.isTricky 
                   ? 'bg-red-600 text-white' 
-                  : 'bg-slate-600 text-slate-300 hover:bg-slate-500'
+                  : 'bg-app-input text-app-text-secondary hover:bg-app-input-dark'
               }`}
             >
               <Flag size={12} />
@@ -139,7 +139,7 @@ const ProblemCard = ({
             </button>
             <button
               onClick={() => onDelete(prob.id)}
-              className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-slate-600 text-slate-300 hover:bg-red-600 hover:text-white"
+              className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors bg-app-input text-app-text-secondary hover:bg-red-600 hover:text-white"
             >
               <Trash2 size={12} />
               Delete

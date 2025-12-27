@@ -9,7 +9,7 @@ const ProgressBar = ({
   trickyCount 
 }) => {
   return (
-    <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+    <div className="bg-app-bg-secondary rounded-xl p-6 border border-app-border">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Trophy className="text-yellow-500" size={24} />
@@ -17,17 +17,17 @@ const ProgressBar = ({
         </div>
         <span className="text-2xl font-bold">{Math.round(totalProgress)}%</span>
       </div>
-      <div className="w-full bg-slate-700 rounded-full h-3">
+      <div className="w-full bg-app-card rounded-full h-3">
         <div 
-          className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500"
+          className="bg-gradient-to-r from-app-accent to-app-accent-light h-3 rounded-full transition-all duration-500"
           style={{ width: `${totalProgress}%` }}
         />
       </div>
       <div className="flex gap-4 mt-3 text-sm flex-wrap">
-        <span className="text-slate-400">
+        <span className="text-app-text-muted">
           {completedInCycle} / 15 this cycle
         </span>
-        <span className="text-green-400">
+        <span className="text-app-accent-light">
           {totalSolved} total solved
         </span>
         <span className="text-yellow-400">

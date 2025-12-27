@@ -31,8 +31,8 @@ const ViewTabs = ({ activeView, onViewChange, totalSolved, reviewCount, trickyCo
                 ? 'bg-yellow-600 text-white'
                 : tab.id === 'tricky'
                 ? 'bg-red-600 text-white'
-                : 'bg-blue-600 text-white'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                : 'bg-app-accent text-white'
+              : 'bg-app-card text-app-text-secondary hover:bg-app-card-hover'
           }`}
         >
           <span className="flex items-center gap-1">
