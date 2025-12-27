@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, Circle, Eye, Flag } from 'lucide-react';
+import { CheckCircle2, Circle, Eye, Flag, Save, Check, X } from 'lucide-react';
 
 const DailyProblemCard = ({ 
   problemNum, 
@@ -7,7 +7,10 @@ const DailyProblemCard = ({
   isCompleted, 
   onToggle, 
   onUpdate, 
-  onToggleFlag 
+  onToggleFlag,
+  onMarkSolvedAndSave,
+  onMarkSolvedOnly,
+  onClear
 }) => {
   return (
     <div 
@@ -61,7 +64,7 @@ const DailyProblemCard = ({
             rows="2"
           />
 
-          <div className="flex gap-2 mt-3">
+          <div className="flex gap-2 mt-3 flex-wrap">
             <button
               onClick={() => onToggleFlag('needsReview')}
               className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors ${
@@ -83,6 +86,31 @@ const DailyProblemCard = ({
             >
               <Flag size={14} />
               Tricky
+            </button>
+            <button
+              onClick={onMarkSolvedAndSave}
+              className="flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors bg-app-input text-app-text-secondary hover:bg-app-input-dark"
+            >
+              <Save size={14} />
+              Mark Solved & Save
+            </button>
+            <button
+              onClick={onMarkSolvedOnly}
+              className={`flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors ${
+                isCompleted 
+                  ? 'bg-app-border-success text-white' 
+                  : 'bg-app-input text-app-text-secondary hover:bg-app-input-dark'
+              }`}
+            >
+              <Check size={14} />
+              Mark Solved
+            </button>
+            <button
+              onClick={onClear}
+              className="flex items-center gap-1 px-3 py-1.5 rounded text-sm transition-colors bg-app-input text-app-text-secondary hover:bg-app-input-dark"
+            >
+              <X size={14} />
+              Clear
             </button>
           </div>
         </div>

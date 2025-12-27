@@ -276,7 +276,6 @@ const DSATracker = () => {
 
   const toggleProblem = (day, problemNum) => {
     const key = `${day}-${problemNum}`;
-    const timestamp = new Date().toISOString();
     const data = dailyProblems[key] || {};
     
     const updatedDailyProblems = {
@@ -291,28 +290,95 @@ const DSATracker = () => {
 
     setDailyProblems(updatedDailyProblems);
     saveDailyToFirebase({ dailyProblems: updatedDailyProblems, currentDay });
+  };
+
+  const markSolvedAndSave = (day, problemNum) => {
+    const key = `${day}-${problemNum}`;
+    const timestamp = new Date().toISOString();
+    const data = dailyProblems[key] || {};
     
-    // If marking as complete, also save to persistent problem data
-    if (!data.completed) {
-      // Remove periods from timestamp to avoid Firestore path issues
-      const uniqueId = `${timestamp.replace(/\./g, '_')}-${day}-${problemNum}`;
-      const newProblem = {
-        name: data.name || '',
-        link: data.link || '',
-        notes: data.notes || '',
-        completedDate: timestamp,
+    // Mark as completed
+    const updatedDailyProblems = {
+      ...dailyProblems,
+      [key]: {
+        ...data,
+        completed: true,
         day: day,
-        problemNum: problemNum,
-        needsReview: data.needsReview || false,
-        isTricky: data.isTricky || false
-      };
-      const updatedProblemData = {
-        ...problemData,
-        [uniqueId]: newProblem
-      };
-      setProblemData(updatedProblemData);
-      saveSolvedToFirebase(uniqueId, newProblem);
-    }
+        problemNum: problemNum
+      }
+    };
+
+    setDailyProblems(updatedDailyProblems);
+    saveDailyToFirebase({ dailyProblems: updatedDailyProblems, currentDay });
+    
+    // Save to persistent problem data
+    const uniqueId = `${timestamp.replace(/\./g, '_')}-${day}-${problemNum}`;
+    const newProblem = {
+      name: data.name || '',
+      link: data.link || '',
+      notes: data.notes || '',
+      completedDate: timestamp,
+      day: day,
+      problemNum: problemNum,
+      needsReview: data.needsReview || false,
+      isTricky: data.isTricky || false
+    };
+    const updatedProblemData = {
+      ...problemData,
+      [uniqueId]: newProblem
+    };
+    setProblemData(updatedProblemData);
+    saveSolvedToFirebase(uniqueId, newProblem);
+  };
+
+  const markSolvedOnly = (day, problemNum) => {
+    const key = `${day}-${problemNum}`;
+    const data = dailyProblems[key] || {};
+    
+    // Toggle completed state, don't save to persistent storage
+    const updatedDailyProblems = {
+      ...dailyProblems,
+      [key]: {
+        ...data,
+        completed: !data.completed,
+        day: day,
+        problemNum: problemNum
+      }
+    };
+
+    setDailyProblems(updatedDailyProblems);
+    saveDailyToFirebase({ dailyProblems: updatedDailyProblems, currentDay });
+  };
+
+  const clearDailyProblem = (day, problemNum) => {
+    setModal({
+      isOpen: true,
+      title: 'Clear Problem',
+      message: 'Are you sure you want to clear this problem? All data (name, link, notes, and flags) will be removed.',
+      type: 'confirm',
+      variant: 'warning',
+      onConfirm: () => {
+        const key = `${day}-${problemNum}`;
+        
+        // Clear all data and unmark
+        const updatedDailyProblems = {
+          ...dailyProblems,
+          [key]: {
+            name: '',
+            link: '',
+            notes: '',
+            completed: false,
+            needsReview: false,
+            isTricky: false,
+            day: day,
+            problemNum: problemNum
+          }
+        };
+
+        setDailyProblems(updatedDailyProblems);
+        saveDailyToFirebase({ dailyProblems: updatedDailyProblems, currentDay });
+      }
+    });
   };
 
   const updateDailyProblem = (key, field, value) => {
@@ -833,6 +899,9 @@ const DSATracker = () => {
                       onToggle={() => toggleProblem(currentDay, problemNum)}
                       onUpdate={(field, value) => updateDailyProblem(key, field, value)}
                       onToggleFlag={(flagType) => toggleDailyFlag(key, flagType)}
+                      onMarkSolvedAndSave={() => markSolvedAndSave(currentDay, problemNum)}
+                      onMarkSolvedOnly={() => markSolvedOnly(currentDay, problemNum)}
+                      onClear={() => clearDailyProblem(currentDay, problemNum)}
                     />
                   );
                 })}
