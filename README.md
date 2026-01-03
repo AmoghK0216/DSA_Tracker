@@ -103,12 +103,14 @@ A personal, lightweight web application to track Data Structures & Algorithms pr
    
    > **Note:** These rules allow open access since this is a personal tracking tool. For additional security, consider restricting by IP or using Firebase App Check.
 
-5. **Run the development server**
+5. **Set Authentication as Anonymous in Firebase**
+
+6. **Run the development server**
    ```bash
    npm run dev
    ```
 
-6. **Build for production**
+7. **Build for production**
    ```bash
    npm run build
    ```

@@ -104,38 +104,57 @@ const DSATracker = () => {
     }
   };
 
-  // One-time migration from old structure to new structure
+  // One-time migration/initialization: migrate old structure if present
+  // and ensure required documents exist in Firestore.
   useEffect(() => {
     const migrateData = async () => {
       try {
         const oldDocRef = doc(db, 'appData', 'main');
         const dailyDocRef = doc(db, 'appData', 'daily');
         const solvedDocRef = doc(db, 'appData', 'solved');
-        
-        // Check if old document exists
+
+        // If old document exists, migrate it into the new structure
         const oldDoc = await getDoc(oldDocRef);
-        
         if (oldDoc.exists()) {
           const oldData = oldDoc.data();
-          
+
           // Migrate daily data
           await setDoc(dailyDocRef, {
             currentDay: oldData.currentDay || 1,
             dailyProblems: oldData.dailyProblems || {},
             lastUpdated: new Date().toISOString()
           });
-          
+
           // Migrate solved data
           await setDoc(solvedDocRef, {
             problemData: oldData.problemData || {},
             lastUpdated: new Date().toISOString()
           });
         }
+
+        // Ensure `daily` doc exists
+        const dailySnap = await getDoc(dailyDocRef);
+        if (!dailySnap.exists()) {
+          await setDoc(dailyDocRef, {
+            currentDay: 1,
+            dailyProblems: {},
+            lastUpdated: new Date().toISOString()
+          });
+        }
+
+        // Ensure `solved` doc exists
+        const solvedSnap = await getDoc(solvedDocRef);
+        if (!solvedSnap.exists()) {
+          await setDoc(solvedDocRef, {
+            problemData: {},
+            lastUpdated: new Date().toISOString()
+          });
+        }
       } catch (error) {
-        console.error('❌ Migration error:', error);
+        console.error('❌ Migration/initialization error:', error);
       }
     };
-    
+
     migrateData();
   }, []);
 
