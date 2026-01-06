@@ -25,7 +25,7 @@ const ProgressBar = ({
       </div>
       <div className="flex gap-4 mt-3 text-sm flex-wrap">
         <span className="text-app-text-muted">
-          {completedInCycle} / 15 this cycle
+          {completedInCycle} / 18 this cycle
         </span>
         <span className="text-app-accent-light">
           {totalSolved} total solved

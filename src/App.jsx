@@ -497,7 +497,7 @@ const DSATracker = () => {
 
   const getTotalProgress = () => {
     const total = Object.values(dailyProblems).filter(p => p.completed).length;
-    return (total / 15) * 100;
+    return (total / 18) * 100;
   };
 
   const getAllSolvedProblems = () => {
