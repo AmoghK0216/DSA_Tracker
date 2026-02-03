@@ -23,6 +23,7 @@ const DSATracker = () => {
   const [dailyProblems, setDailyProblems] = useState({});
   const [editingProblemId, setEditingProblemId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTopic, setSelectedTopic] = useState('all');
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newProblem, setNewProblem] = useState({
     name: '',
@@ -556,14 +557,24 @@ const DSATracker = () => {
   };
 
   const filterBySearch = (problems) => {
-    if (!searchTerm.trim()) return problems;
+    let filtered = problems;
     
-    const search = searchTerm.toLowerCase();
-    return problems.filter(prob => 
-      (prob.name || '').toLowerCase().includes(search) ||
-      (prob.link || '').toLowerCase().includes(search) ||
-      (prob.notes || '').toLowerCase().includes(search)
-    );
+    // Filter by topic
+    if (selectedTopic !== 'all') {
+      filtered = filtered.filter(prob => prob.day === parseInt(selectedTopic));
+    }
+    
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(prob => 
+        (prob.name || '').toLowerCase().includes(search) ||
+        (prob.link || '').toLowerCase().includes(search) ||
+        (prob.notes || '').toLowerCase().includes(search)
+      );
+    }
+    
+    return filtered;
   };
 
   const addNewProblem = () => {
@@ -647,22 +658,52 @@ const DSATracker = () => {
 
     return (
       <>
-        <div className="flex items-center justify-between mb-4">
-          <SearchBar
-            ref={searchInputRef}
-            searchTerm={searchTerm} 
-            onSearchChange={setSearchTerm}
-            placeholder="Search by name, link, or notes..."
-          />
-          {!isAddingNew && (
-            <button
-              onClick={() => setIsAddingNew(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-app-accent hover:bg-app-accent-hover rounded-lg transition-colors ml-3 flex-shrink-0"
+        <div className="mb-4">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="flex-1">
+              <SearchBar
+                ref={searchInputRef}
+                searchTerm={searchTerm} 
+                onSearchChange={setSearchTerm}
+                placeholder="Search by name, link, or notes..."
+              />
+            </div>
+            {!isAddingNew && (
+              <button
+                onClick={() => setIsAddingNew(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-app-accent hover:bg-app-accent-hover rounded-lg transition-colors flex-shrink-0"
+              >
+                <Plus size={16} />
+                Add Problem
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm text-app-text-muted">Filter by topic:</label>
+            <select
+              value={selectedTopic}
+              onChange={(e) => setSelectedTopic(e.target.value)}
+              className="bg-app-card border border-app-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-app-accent transition-colors"
             >
-              <Plus size={16} />
-              Add Problem
-            </button>
-          )}
+              <option value="all">All Topics</option>
+              {topics.map(topic => (
+                <option key={topic.day} value={topic.day}>
+                  Day {topic.day} - {topic.name}
+                </option>
+              ))}            </select>
+            {selectedTopic !== 'all' && (
+              <button
+                onClick={() => {
+                  setSelectedTopic('all');
+                  setSearchTerm('');
+                }}
+                className="text-sm text-app-accent-light hover:text-app-accent transition-colors flex items-center gap-1"
+              >
+                <X size={14} />
+                Clear filters
+              </button>
+            )}
+          </div>
         </div>
 
         {isAddingNew && (
@@ -761,7 +802,15 @@ const DSATracker = () => {
         {filteredProblems.length === 0 && !isAddingNew ? (
           <div className="text-center py-12 text-app-text-muted">
             <AlertCircle size={48} className="mx-auto mb-4 opacity-50" />
-            <p>No problems match "{searchTerm}"</p>
+            <p>
+              {searchTerm && selectedTopic !== 'all'
+                ? `No problems match "${searchTerm}" in ${topics.find(t => t.day === parseInt(selectedTopic))?.name}`
+                : searchTerm
+                ? `No problems match "${searchTerm}"`
+                : selectedTopic !== 'all'
+                ? `No problems in ${topics.find(t => t.day === parseInt(selectedTopic))?.name}`
+                : 'No problems found'}
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -802,16 +851,52 @@ const DSATracker = () => {
 
     return (
       <>
-        <SearchBar
-          ref={searchInputRef}
-          searchTerm={searchTerm} 
-          onSearchChange={setSearchTerm}
-          placeholder="Search by name, link, or notes..."
-        />
+        <div className="mb-4">
+          <SearchBar
+            ref={searchInputRef}
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm}
+            placeholder="Search by name, link, or notes..."
+          />
+          <div className="flex items-center gap-2 mt-3">
+            <label className="text-sm text-app-text-muted">Filter by topic:</label>
+            <select
+              value={selectedTopic}
+              onChange={(e) => setSelectedTopic(e.target.value)}
+              className="bg-app-card border border-app-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-app-accent transition-colors"
+            >
+              <option value="all">All Topics</option>
+              {topics.map(topic => (
+                <option key={topic.day} value={topic.day}>
+                  Day {topic.day} - {topic.name}
+                </option>
+              ))}            </select>
+            {selectedTopic !== 'all' && (
+              <button
+                onClick={() => {
+                  setSelectedTopic('all');
+                  setSearchTerm('');
+                }}
+                className="text-sm text-app-accent-light hover:text-app-accent transition-colors flex items-center gap-1"
+              >
+                <X size={14} />
+                Clear filters
+              </button>
+            )}
+          </div>
+        </div>
         {searchFiltered.length === 0 ? (
           <div className="text-center py-12 text-app-text-muted">
             <AlertCircle size={48} className="mx-auto mb-4 opacity-50" />
-            <p>No problems match "{searchTerm}"</p>
+            <p>
+              {searchTerm && selectedTopic !== 'all'
+                ? `No problems match "${searchTerm}" in ${topics.find(t => t.day === parseInt(selectedTopic))?.name}`
+                : searchTerm
+                ? `No problems match "${searchTerm}"`
+                : selectedTopic !== 'all'
+                ? `No problems in ${topics.find(t => t.day === parseInt(selectedTopic))?.name}`
+                : 'No problems found'}
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
